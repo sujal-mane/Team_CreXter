@@ -1,14 +1,22 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { gsap, ScrollTrigger } from '../hooks/useGsap';
-import { ngos } from '../data/mockData';
+import { ngoApi } from '../services/api';
+import { ngos as fallbackNgos } from '../data/mockData';
 import { Star, ShieldCheck } from 'lucide-react';
 import './NGOs.css';
 
 export default function NGOs() {
     const gridRef = useRef(null);
+    const [ngos, setNgos] = useState([]);
 
     useEffect(() => {
-        if (!gridRef.current) return;
+        ngoApi.getAll()
+            .then(data => setNgos(data))
+            .catch(() => setNgos(fallbackNgos));
+    }, []);
+
+    useEffect(() => {
+        if (!gridRef.current || ngos.length === 0) return;
         const ctx = gsap.context(() => {
             gsap.from('.ngo-card', {
                 y: 50, opacity: 0, scale: 0.95, duration: 0.6, stagger: 0.08, ease: 'power3.out',
@@ -16,7 +24,7 @@ export default function NGOs() {
             });
         }, gridRef.current);
         return () => ctx.revert();
-    }, []);
+    }, [ngos]);
 
     return (
         <main className="ngo-page">
@@ -36,7 +44,7 @@ export default function NGOs() {
                     </div>
                     <div className="ngo-grid">
                         {ngos.slice(0, 3).map((ngo) => (
-                            <div className="ngo-card" key={ngo.id}>
+                            <div className="ngo-card" key={ngo._id || ngo.id}>
                                 <div className="ngo-card__top">
                                     <div className="ngo-card__logo">{ngo.logo}</div>
                                     {ngo.verified ? (
