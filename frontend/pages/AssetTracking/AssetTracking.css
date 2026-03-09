@@ -1,8 +1,11 @@
-/* ── Asset Tracking Dashboard ─────────────────── */
+/* ══════════════════════════════════════════════════════════
+   Asset Tracking Dashboard — HelpLink
+   ══════════════════════════════════════════════════════════ */
 
 .tracking-page {
     display: flex;
     min-height: 100vh;
+    padding-top: 70px;               /* offset for site navbar */
     background: #030712;
     color: #e2e8f0;
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
@@ -30,20 +33,25 @@
 
 /* ── Sidebar ──────────────────────────────────── */
 .tracking-sidebar {
-    width: 240px;
+    width: 230px;
     background: #0f172a;
     border-right: 1px solid #1e293b;
     display: flex;
     flex-direction: column;
     padding: 1.5rem 0;
     flex-shrink: 0;
+    position: sticky;
+    top: 70px;
+    height: calc(100vh - 70px);
+    overflow-y: auto;
+    z-index: 10;
 }
 .tracking-sidebar__brand {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0 1.5rem 1.5rem;
-    font-size: 1.1rem;
+    padding: 0 1.25rem 1.25rem;
+    font-size: 1.05rem;
     font-weight: 700;
     color: #6366f1;
     border-bottom: 1px solid #1e293b;
@@ -64,6 +72,7 @@
     background: transparent;
     color: #94a3b8;
     font-size: 0.875rem;
+    font-family: inherit;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
@@ -75,7 +84,7 @@
     color: #e2e8f0;
 }
 .tracking-sidebar__link--active {
-    background: #6366f120;
+    background: rgba(99, 102, 241, 0.12);
     color: #818cf8;
     font-weight: 600;
 }
@@ -83,7 +92,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 1rem 1.5rem;
+    padding: 1rem 1.25rem;
     border-top: 1px solid #1e293b;
     color: #10b981;
     font-size: 0.8rem;
@@ -95,8 +104,8 @@
     animation: pulse 1.5s ease-in-out infinite;
 }
 @keyframes pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 #10b98144; }
-    50% { opacity: 0.6; box-shadow: 0 0 0 6px #10b98100; }
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.26); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
 }
 
 /* ── Main ─────────────────────────────────────── */
@@ -111,14 +120,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.25rem 2rem;
+    padding: 1.25rem 1.75rem;
     border-bottom: 1px solid #1e293b;
     background: #0f172a;
     flex-wrap: wrap;
     gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 5;
 }
 .tracking-topbar__title {
-    font-size: 1.35rem;
+    font-size: clamp(1rem, 2.5vw, 1.35rem);
     font-weight: 700;
     color: #f1f5f9;
     margin: 0;
@@ -132,6 +144,7 @@
     display: flex;
     gap: 0.75rem;
     align-items: center;
+    flex-wrap: wrap;
 }
 .tracking-search {
     display: flex;
@@ -141,6 +154,11 @@
     border: 1px solid #334155;
     border-radius: 8px;
     padding: 0.5rem 0.75rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.tracking-search:focus-within {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 .tracking-search input {
     background: transparent;
@@ -148,6 +166,7 @@
     outline: none;
     color: #e2e8f0;
     font-size: 0.85rem;
+    font-family: inherit;
     width: 160px;
 }
 .tracking-search input::placeholder { color: #475569; }
