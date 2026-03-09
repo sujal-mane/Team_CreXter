@@ -4,25 +4,24 @@ import { useDonors } from '../context/DonorContext';
 import './DonarDashboard.css';
 
 export default function DonarDashboard() {
-    const { donors } = useDonors();
+    const { donors, searchDonor } = useDonors();
     const [searchEmail, setSearchEmail] = useState('');
     const [searchPhone, setSearchPhone] = useState('');
-    const [foundId, setFoundId] = useState(null);
     const [searched, setSearched] = useState(false);
     const [expandedTracking, setExpandedTracking] = useState(null);
 
-    // Always read fresh data from context so approval updates appear instantly
-    const found = foundId ? donors.find(d => d.donorId === foundId) || null : null;
+    const [found, setFound] = useState(null);
 
     const approvedDonors = donors.filter(d => d.status === 'approved' && d.approvalDetails);
 
-    const handleSearch = (e) => {
+    const handleSearch = async (e) => {
         e.preventDefault();
-        const match = donors.find(
-            d => (searchEmail && d.email.toLowerCase() === searchEmail.toLowerCase()) ||
-                 (searchPhone && d.phone === searchPhone)
-        );
-        setFoundId(match ? match.donorId : null);
+        try {
+            const match = await searchDonor({ email: searchEmail, phone: searchPhone });
+            setFound(match);
+        } catch {
+            setFound(null);
+        }
         setSearched(true);
     };
 
@@ -65,13 +64,13 @@ export default function DonarDashboard() {
                     ) : (
                         <div className="donar-approved-list">
                             {approvedDonors.map(donor => (
-                                <div key={donor.donorId} className="donar-approved-card">
+                                <div key={donor._id} className="donar-approved-card">
                                     <div className="donar-approved-card__top">
                                         <div className="donar-approved-card__donor">
                                             <div className="donar-approved-card__avatar">{donor.fullName.charAt(0).toUpperCase()}</div>
                                             <div>
                                                 <h4>{donor.fullName}</h4>
-                                                <span className="donar-approved-card__id">{donor.donorId}</span>
+                                                <span className="donar-approved-card__id">{donor._id}</span>
                                             </div>
                                         </div>
                                         <span className="donar-approved-card__badge">✅ Approved</span>
@@ -135,10 +134,10 @@ export default function DonarDashboard() {
                                         <span>🩸 {donor.bloodGroup}</span>
                                         <span>📍 {donor.city}, {donor.state}</span>
                                         <span>📧 {donor.email}</span>
-                                        {donor.approvedAt && <span>✅ Approved: {new Date(donor.approvedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
+                                        {donor.updatedAt && donor.status === 'approved' && <span>✅ Approved: {new Date(donor.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
                                     </div>
 
-                                    <button className="donar-approved-card__btn" onClick={() => { setFoundId(donor.donorId); setSearched(true); document.getElementById('donar-search-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
+                                    <button className="donar-approved-card__btn" onClick={() => { setFound(donor); setSearched(true); document.getElementById('donar-search-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
                                         📄 View Full Details
                                     </button>
 
@@ -149,7 +148,7 @@ export default function DonarDashboard() {
                                         const nextStage = donor.tracking.stages.find(s => s.status === 'pending');
                                         const allDone = donor.tracking.stages.every(s => s.status === 'completed');
                                         const progress = (completed.length / donor.tracking.stages.length) * 100;
-                                        const isExpanded = expandedTracking === donor.donorId;
+                                        const isExpanded = expandedTracking === donor._id;
 
                                         return (
                                             <div className="donar-live-tracking">
@@ -200,7 +199,7 @@ export default function DonarDashboard() {
                                                 {/* Expand/Collapse Button */}
                                                 <button
                                                     className="donar-live-tracking__expand-btn"
-                                                    onClick={() => setExpandedTracking(isExpanded ? null : donor.donorId)}
+                                                    onClick={() => setExpandedTracking(isExpanded ? null : donor._id)}
                                                 >
                                                     {isExpanded ? '▲ Hide Full Timeline' : '▼ View Full Tracking Timeline'}
                                                 </button>
@@ -324,7 +323,7 @@ export default function DonarDashboard() {
                                         <div className="donar-info-card__avatar">{found.fullName.charAt(0).toUpperCase()}</div>
                                         <div>
                                             <h3>{found.fullName}</h3>
-                                            <span className="donar-info-card__id">Donor ID: {found.donorId}</span>
+                                            <span className="donar-info-card__id">Donor ID: {found._id}</span>
                                         </div>
                                     </div>
                                     <div className="donar-info-card__grid">
@@ -499,7 +498,7 @@ export default function DonarDashboard() {
                                             <div className="donar-timeline__dot">✓</div>
                                             <div>
                                                 <strong>Registered</strong>
-                                                <span>{new Date(found.registeredAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                                                <span>{new Date(found.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
                                         </div>
                                         <div className={`donar-timeline__step ${found.status === 'approved' || found.status === 'rejected' ? 'donar-timeline__step--done' : 'donar-timeline__step--active'}`}>
@@ -514,8 +513,8 @@ export default function DonarDashboard() {
                                             <div>
                                                 <strong>{found.status === 'rejected' ? 'Rejected' : 'Approved'}</strong>
                                                 <span>
-                                                    {found.status === 'approved' && found.approvedAt
-                                                        ? new Date(found.approvedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                                                    {found.status === 'approved' && found.updatedAt
+                                                        ? new Date(found.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
                                                         : found.status === 'rejected' ? 'Application not approved' : 'Awaiting approval'}
                                                 </span>
                                             </div>

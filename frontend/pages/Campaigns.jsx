@@ -187,12 +187,15 @@ export default function Campaigns() {
         setStep(prev => Math.max(prev - 1, 1));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateStep()) {
-            registerDonor(form);
-            // Redirect to dashboard, passing email/phone for lookup
-            navigate('/donar-dashboard', { state: { email: form.email, phone: form.phone } });
+            try {
+                await registerDonor(form);
+                navigate('/donar-dashboard', { state: { email: form.email, phone: form.phone } });
+            } catch (err) {
+                alert('Registration failed: ' + err.message);
+            }
         }
     };
 
