@@ -14,6 +14,7 @@ import OrganDetail from './pages/OrganDetail';
 import DonorRegistration from './pages/DonorRegistration';
 import DonarDashboard from './pages/DonarDashboard';
 import FoodDonation from './pages/FoodDonation';
+import AssetTracking from './pages/AssetTracking/AssetTracking';
 import { DonorProvider } from './context/DonorContext';
 
 /* Scroll to top + page transition on navigation */
@@ -138,6 +139,7 @@ function AppInner() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
           <Route path="/hospital" element={<Hospital />} />
+          <Route path="/asset-tracking" element={<AssetTracking />} />
           <Route path="/donate" element={<Donate />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

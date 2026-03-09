@@ -44,3 +44,18 @@ export const hospitalApi = {
     getAll: () => request('/hospitals'),
     getById: (id) => request(`/hospitals/${encodeURIComponent(id)}`),
 };
+
+// ── Equipment Tracking ──────────────────────────
+export const equipmentApi = {
+    getAll: (search) => request(`/equipment${search ? `?search=${encodeURIComponent(search)}` : ''}`),
+    getById: (id) => request(`/equipment/${encodeURIComponent(id)}`),
+    updateLocation: (device_id, location) =>
+        request('/equipment/update-location', { method: 'POST', body: JSON.stringify({ device_id, location }) }),
+    toggleStatus: (id, status) =>
+        request(`/equipment/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+};
+
+// ── Movement History ────────────────────────────
+export const historyApi = {
+    getAll: (limit = 50) => request(`/history?limit=${limit}`),
+};

@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const startSimulator = require('./simulator/bleSimulator');
 
 dotenv.config();
 
@@ -19,6 +20,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/donors', require('./routes/donors'));
 app.use('/api/ngos', require('./routes/ngos'));
 app.use('/api/hospitals', require('./routes/hospitals'));
+app.use('/api/equipment', require('./routes/equipment'));
+app.use('/api/history', require('./routes/history'));
 
 // Health check
 app.get('/', (req, res) => {
@@ -28,4 +31,6 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    // Start BLE beacon simulator
+    startSimulator();
 });
