@@ -1,4 +1,4 @@
-const Ngo = require('../models/Ngo');
+const Ngo = require('../models/NGO');
 
 exports.getAllNgos = async (req, res) => {
     try {
